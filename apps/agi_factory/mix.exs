@@ -25,15 +25,13 @@ defmodule AgiFactory.MixProject do
 
   defp deps do
     [
-      {:ash, "~> 3.0"},
-      {:ash_postgres, "~> 2.0"},
-      {:ash_json_api, "~> 1.4"},
-      {:ash_reactor, "~> 0.15"},
-      {:reactor, "~> 0.15"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, "~> 0.17"},
       {:phoenix_pubsub, "~> 2.1"},
       {:telemetry, "~> 1.2"},
+      {:decimal, "~> 2.0"},
+      {:jason, "~> 1.4"},
+      {:mox, "~> 1.0", only: :test},
       {:requirements_parser, in_umbrella: true},
       {:dsl_synthesizer, in_umbrella: true},
       {:usage_analyzer, in_umbrella: true},

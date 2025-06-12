@@ -50,7 +50,7 @@ defmodule UsageAnalyzer do
     data_sources = Map.get(opts, :data_sources, [:local])
     time_window = Map.get(opts, :time_window, "30d")
     
-    create!(UsageAnalyzer.Resources.AnalysisReport, %{
+    Ash.create!(UsageAnalyzer.Resources.AnalysisReport, %{
       target_dsl: target_dsl,
       analysis_type: analysis_type,
       data_sources: data_sources,
@@ -63,7 +63,7 @@ defmodule UsageAnalyzer do
   Collects real-time telemetry data for a DSL.
   """
   def start_telemetry_collection(dsl_module, duration_ms \\ 300_000) do
-    create!(UsageAnalyzer.Resources.PerformanceMetric, %{
+    Ash.create!(UsageAnalyzer.Resources.PerformanceMetric, %{
       target_dsl: inspect(dsl_module),
       metric_type: :telemetry_collection,
       collection_duration_ms: duration_ms,
@@ -78,7 +78,7 @@ defmodule UsageAnalyzer do
     analysis_scope = Map.get(opts, :scope, :comprehensive)
     data_sources = Map.get(opts, :data_sources, [:local, :telemetry])
     
-    create!(UsageAnalyzer.Resources.PainPointAnalysis, %{
+    Ash.create!(UsageAnalyzer.Resources.PainPointAnalysis, %{
       target_dsl: target_dsl,
       analysis_scope: analysis_scope,
       data_sources: data_sources,
@@ -90,7 +90,7 @@ defmodule UsageAnalyzer do
   Analyzes performance characteristics of a DSL.
   """
   def analyze_performance(target_dsl, workload_type \\ :standard) do
-    create!(UsageAnalyzer.Resources.PerformanceMetric, %{
+    Ash.create!(UsageAnalyzer.Resources.PerformanceMetric, %{
       target_dsl: target_dsl,
       metric_type: :performance_analysis,
       workload_type: workload_type,
@@ -121,7 +121,7 @@ defmodule UsageAnalyzer do
     additional_analyses = []
     
     if include_patterns do
-      {:ok, pattern_analysis} = create!(UsageAnalyzer.Resources.PatternDetection, %{
+      {:ok, pattern_analysis} = Ash.create!(UsageAnalyzer.Resources.PatternDetection, %{
         analysis_report_id: report.id,
         target_dsl: target_dsl,
         detection_scope: :comprehensive
@@ -130,7 +130,7 @@ defmodule UsageAnalyzer do
     end
     
     if include_performance do
-      {:ok, perf_analysis} = create!(UsageAnalyzer.Resources.PerformanceMetric, %{
+      {:ok, perf_analysis} = Ash.create!(UsageAnalyzer.Resources.PerformanceMetric, %{
         analysis_report_id: report.id,
         target_dsl: target_dsl,
         metric_type: :comprehensive_analysis
@@ -139,7 +139,7 @@ defmodule UsageAnalyzer do
     end
     
     if include_pain_points do
-      {:ok, pain_analysis} = create!(UsageAnalyzer.Resources.PainPointAnalysis, %{
+      {:ok, pain_analysis} = Ash.create!(UsageAnalyzer.Resources.PainPointAnalysis, %{
         analysis_report_id: report.id,
         target_dsl: target_dsl,
         analysis_scope: :comprehensive
@@ -200,13 +200,13 @@ defmodule UsageAnalyzer do
   def get_usage_analytics(opts \\ %{}) do
     timeframe = Map.get(opts, :timeframe, "7d")
     
-    reports = read!(UsageAnalyzer.Resources.AnalysisReport, 
+    reports = Ash.read!(UsageAnalyzer.Resources.AnalysisReport, 
       :recent, %{timeframe: timeframe})
-    patterns = read!(UsageAnalyzer.Resources.PatternDetection, 
+    patterns = Ash.read!(UsageAnalyzer.Resources.PatternDetection, 
       :recent, %{timeframe: timeframe})
-    performance_metrics = read!(UsageAnalyzer.Resources.PerformanceMetric, 
+    performance_metrics = Ash.read!(UsageAnalyzer.Resources.PerformanceMetric, 
       :recent, %{timeframe: timeframe})
-    pain_points = read!(UsageAnalyzer.Resources.PainPointAnalysis, 
+    pain_points = Ash.read!(UsageAnalyzer.Resources.PainPointAnalysis, 
       :recent, %{timeframe: timeframe})
     
     %{

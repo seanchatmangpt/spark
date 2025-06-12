@@ -24,16 +24,13 @@ defmodule RequirementsParser.MixProject do
 
   defp deps do
     [
-      {:ash, "~> 3.0"},
-      {:ash_postgres, "~> 2.0"},
-      {:ash_reactor, "~> 0.15"},
-      {:reactor, "~> 0.15"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, "~> 0.17"},
       {:nx, "~> 0.7"},
-      {:bumblebee, "~> 0.5"},
-      {:tokenizers, "~> 0.4"},
-      {:telemetry, "~> 1.2"}
+      {:telemetry, "~> 1.2"},
+      {:decimal, "~> 2.0"},
+      {:jason, "~> 1.4"},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 end
