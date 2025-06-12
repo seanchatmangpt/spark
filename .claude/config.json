@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**/*)",
+      "Write(**/*.ex)",
+      "Write(**/*.exs)", 
+      "Write(**/*.md)",
+      "Write(**/*.json)",
+      "Write(**/*.yml)",
+      "Write(**/*.yaml)",
+      "Write(mix.exs)",
+      "Write(.formatter.exs)",
+      "LS(**/*)",
+      "Glob(**/*)",
+      "Grep(**/*)",
+      "Bash(mix *)",
+      "Bash(iex *)",
+      "Bash(elixir *)",
+      "Bash(git *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(chmod 777 *)",
+      "Write(/etc/**/*)",
+      "Write(/usr/**/*)",
+      "Write(/bin/**/*)",
+      "Write(/sbin/**/*)",
+      "Write(~/.ssh/**/*)",
+      "Write(~/.aws/**/*)"
+    ]
+  },
+  "project_info": {
+    "name": "Spark DSL Framework",
+    "description": "Elixir framework for building powerful, extensible Domain Specific Languages",
+    "language": "Elixir",
+    "framework": "Spark",
+    "version": "2.2.65"
+  }
+}

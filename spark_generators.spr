@@ -1,0 +1,286 @@
+# Spark Generator Specifications - SPR (Sparse Priming Representation)
+
+## CORE GENERATOR COMMANDS
+
+### DSL Generator (`mix spark.gen.dsl`)
+**Syntax**: `mix spark.gen.dsl MODULE_NAME [OPTIONS]`
+**Purpose**: Generate complete Spark DSL module with sections, entities, args, options
+
+**Options Matrix**:
+- `--section|-s` : `name` OR `name:entity_module` (CSV list)
+- `--entity|-e` : `name:identifier_type:entity_type` (CSV list)  
+- `--arg|-a` : `name:type:default` (CSV list)
+- `--opt|-o` : `name:type:default` (CSV list)
+- `--singleton-entity` : Entity names for singleton constraint (CSV)
+- `--transformer|-t` : Transformer module names (CSV)
+- `--verifier|-v` : Verifier module names (CSV)
+- `--extension` : Generate as extension vs standalone DSL (boolean)
+- `--fragments` : Enable DSL fragments support (boolean)
+- `--ignore-if-exists` : Skip if DSL exists (boolean)
+
+**Type System**:
+```
+atom, string, boolean, integer, pos_integer, module, keyword_list, map, list, {list, :any}
+```
+
+**Default Parsing**:
+- boolean: "true" → true, "false" → false
+- integer/pos_integer: String.to_integer/1
+- atom: String.to_atom/1
+- other: string literal
+
+**Template Structure**:
+```elixir
+# Extension mode:
+use Spark.Dsl.Extension, transformers: [], verifiers: []
+
+# Standalone mode:
+use Spark.Dsl
+
+# Optional fragments:
+@fragments []
+use Spark.Dsl.Fragment, fragments: @fragments
+
+# Generated sections, entities, args, opts with @moduledoc
+```
+
+### Entity Generator (`mix spark.gen.entity`)
+**Syntax**: `mix spark.gen.entity MODULE_NAME [OPTIONS]`
+**Purpose**: Generate DSL entity target module with validation & behavior
+
+**Options Matrix**:
+- `--name|-n` : Entity name (defaults to module basename)
+- `--identifier|-i` : Identifier field name (string)
+- `--args|-a` : `name:type:modifiers` (CSV, modifiers: required)
+- `--schema|-s` : `name:type` comma-separated pairs
+- `--validations` : Custom validation function names (CSV)
+- `--examples` : Generate example documentation (boolean)
+- `--ignore-if-exists` : Skip if exists (boolean)
+
+**Generated Components**:
+- `@behaviour Spark.Dsl.Entity`
+- `defstruct` with all schema+args fields
+- `@type t` specifications
+- `transform/1` callback
+- `new/1` factory function with validation
+- `validate/1` function
+- Private validation helpers
+- Optional usage examples
+
+**Type Spec Mapping**:
+```
+string → String.t(), atom → atom(), integer → integer()
+boolean → boolean(), module → module(), any → any(), _ → term()
+```
+
+### Section Generator (`mix spark.gen.section`)
+**Syntax**: `mix spark.gen.section MODULE_NAME [OPTIONS]`
+**Purpose**: Generate basic Spark DSL Section module
+
+**Options Matrix**:
+- `--persisted|-p` : Persisted keys reference list (CSV)
+- `--checks|-c` : Check function placeholder (CSV, not implemented)
+
+**Template Structure**:
+```elixir
+use Spark.Dsl.Section
+alias Spark.Dsl.Section
+
+def configure_section(dsl) do
+end
+```
+
+### Verifier Generator (`mix spark.gen.verifier`)
+**Syntax**: `mix spark.gen.verifier MODULE_NAME [OPTIONS]`
+**Purpose**: Generate DSL verifier module for validation
+
+**Options Matrix**:
+- `--persisted|-p` : Persisted keys reference (CSV)
+- `--checks|-c` : Check definitions (CSV, placeholder)
+
+**Template Structure**:
+```elixir
+use Spark.Dsl.Verifier
+
+def verify(dsl) do
+  IO.inspect(dsl)
+end
+```
+
+## UTILITY COMMANDS
+
+### Formatter (`mix spark.formatter`)
+**Syntax**: `mix spark.formatter --extensions EXTENSION_LIST [--check]`
+**Purpose**: Manage `spark_locals_without_parens` in .formatter.exs
+
+**Requirements**:
+- `spark_locals_without_parens = []` must exist in .formatter.exs
+- Sourceror dependency required
+- Extensions must be compiled
+
+**Process**:
+1. Parse extensions from CSV
+2. Extract entity builders from sections & patches
+3. Generate locals_without_parens list
+4. Update/validate .formatter.exs content
+
+### Cheat Sheets (`mix spark.cheat_sheets`)
+**Syntax**: `mix spark.cheat_sheets --extensions EXTENSION_LIST`
+**Purpose**: Generate DSL documentation cheat sheets
+
+**Output**: `documentation/dsls/DSL-{ExtensionName}.md`
+**Dependencies**: Igniter required
+**Process**: Auto-runs with `--yes` flag, generates per-extension docs
+
+## ARCHITECTURAL PATTERNS
+
+### DSL Extension Structure
+```elixir
+defmodule MyLib.Dsl do
+  # 1. Entity structs
+  defmodule EntityName do
+    defstruct [:field1, :field2]
+  end
+  
+  # 2. Entity definitions
+  @entity_name %Spark.Dsl.Entity{
+    name: :entity_name,
+    args: [:arg1, :arg2],
+    target: EntityName,
+    schema: [validation_rules]
+  }
+  
+  # 3. Section definitions
+  @section_name %Spark.Dsl.Section{
+    name: :section_name,
+    entities: [@entity_name],
+    schema: [section_options]
+  }
+  
+  # 4. Extension declaration
+  use Spark.Dsl.Extension,
+    sections: [@section_name],
+    transformers: [TransformerModule],
+    verifiers: [VerifierModule]
+end
+```
+
+### DSL Usage Pattern
+```elixir
+defmodule MyLib do
+  use Spark.Dsl, default_extensions: [
+    extensions: [MyLib.Dsl]
+  ]
+end
+
+# User implementation
+defmodule MyApp.Implementation do
+  use MyLib
+  
+  section_name do
+    entity_name :identifier do
+      # configuration
+    end
+  end
+end
+```
+
+### Info Module Pattern
+```elixir
+defmodule MyLib.Info do
+  use Spark.InfoGenerator,
+    extension: MyLib.Dsl,
+    sections: [:section_name]
+end
+```
+
+## QUALITY VALIDATION REQUIREMENTS
+
+### Code Generation Standards
+1. **Moduledoc**: Every generated module requires @moduledoc
+2. **Type Specs**: All functions need @spec annotations
+3. **Documentation**: Doc strings for public functions
+4. **Validation**: Input validation in entity factories
+5. **Error Handling**: Proper error tuples {:ok, result} | {:error, reason}
+
+### Testing Patterns
+- Unit tests for transformers/verifiers
+- Integration tests for complete DSL workflows
+- Property-based testing for transformers
+- Validation testing for verifiers
+
+### Dependencies & Requirements
+- **Igniter**: Required for all generators (graceful fallback provided)
+- **Sourceror**: Required for formatter task
+- **Elixir**: >= 1.11
+- **Compile**: Extensions must be compiled before use
+
+### File Organization
+```
+lib/
+├── my_lib/
+│   ├── dsl.ex              # Main DSL extension
+│   ├── info.ex             # InfoGenerator module  
+│   ├── transformers/       # Compile-time transformations
+│   └── verifiers/          # DSL validation
+```
+
+## CONVENTIONS & BEST PRACTICES
+
+### Naming Conventions
+- DSL modules: `MyLib.Dsl`
+- Info modules: `MyLib.Info`
+- Entity modules: `MyLib.Entities.EntityName`
+- Transformers: `MyLib.Transformers.ActionName`
+- Verifiers: `MyLib.Verifiers.VerifyCondition`
+
+### Error Handling Patterns
+```elixir
+# Verifier errors
+{:error, Spark.Error.DslError.exception(
+  message: "Error description",
+  path: [:section, :option],
+  module: Spark.Dsl.Verifier.get_persisted(dsl_state, :module)
+)}
+
+# Validation errors
+raise ArgumentError, "Required field #{field} is missing"
+```
+
+### Documentation Standards
+- Usage examples in @moduledoc
+- Parameter documentation for all options
+- Behavior specifications for entities
+- Schema documentation with types & constraints
+
+### Performance Considerations
+- Transformers: Compile-time execution
+- Verifiers: Final structure validation
+- Info modules: Runtime introspection
+- Minimize runtime overhead via compile-time processing
+
+## COMMAND COMPOSITION PATTERNS
+
+### Auto-composition
+- DSL generator auto-creates referenced transformers/verifiers
+- Uses `Igniter.compose_task/3` for chaining
+- Verifier: `"spark.gen.verifier"` with `[name, "--dsl", dsl_module]`
+- Transformer: `"spark.gen.transformer"` with `[name, "--dsl", dsl_module]`
+
+### Integration Workflow
+1. Generate DSL with extensions, entities, sections
+2. Auto-generate referenced transformers/verifiers  
+3. Generate entity target modules
+4. Update formatter configuration
+5. Generate documentation cheat sheets
+
+### Error Recovery
+- `--ignore-if-exists` prevents overwrites
+- Graceful degradation without Igniter
+- Clear error messages for missing dependencies
+- Validation before file generation
+
+---
+**Compression Level**: HIGH
+**Target Usage**: Pipeline commands, code generation, DSL scaffolding
+**Last Updated**: Based on Spark v2.2.65+ codebase analysis

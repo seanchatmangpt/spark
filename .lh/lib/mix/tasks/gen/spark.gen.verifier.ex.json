@@ -1,0 +1,38 @@
+{
+    "sourceFile": "lib/mix/tasks/gen/spark.gen.verifier.ex",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1738184307703,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1738184523164,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,12 +8,10 @@\n         mix spark.gen.verifier Spark.Test.Contact.Verifiers.VerifyNotGandalf\n \n     ## Options\n \n-    * `--persisted` - A list of persisted keys to reference in the verifier (e.g., `module`).\n-    * `--checks` - Defines checks that the verifier will perform (placeholder for now).\n-    * `--error-message` - The error message if the check fails.\n-    * `--error-path` - The DSL path where the error should be associated.\n+    * `--persisted` - List of persisted keys to reference (e.g., `module`).\n+    * `--checks` - Placeholder for defining checks (not implemented yet).\n     \"\"\"\n \n     @shortdoc \"Generate a Spark DSL Verifier.\"\n     use Igniter.Mix.Task\n@@ -24,17 +22,13 @@\n         positional: [:verifier_module],\n         example: \"mix spark.gen.verifier Spark.Test.Contact.Verifiers.VerifyNotGandalf\",\n         schema: [\n           persisted: :csv,\n-          checks: :csv,\n-          error_message: :string,\n-          error_path: :csv\n+          checks: :csv\n         ],\n         aliases: [\n           p: :persisted,\n-          c: :checks,\n-          e: :error_message,\n-          ep: :error_path\n+          c: :checks\n         ]\n       }\n     end\n \n"
+                },
+                {
+                    "date": 1738184757620,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,16 +39,14 @@\n \n       verifier_module = Igniter.Project.Module.parse(arguments.verifier_module)\n \n       template = \"\"\"\n-      defmodule #{verifier_module} do\n-        @moduledoc \\\"\\\"\\\"\n-        Generated Spark DSL Verifier.\n-        \\\"\\\"\\\"\n-        use Spark.Dsl.Verifier\n+      @moduledoc \\\"\\\"\\\"\n+      Generated Spark DSL Verifier.\n+      \\\"\\\"\\\"\n+      use Spark.Dsl.Verifier\n \n-        def verify(dsl) do\n-        end\n+      def verify(dsl) do\n       end\n       \"\"\"\n \n       igniter\n"
+                },
+                {
+                    "date": 1738184830564,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,8 +43,9 @@\n       @moduledoc \\\"\\\"\\\"\n       Generated Spark DSL Verifier.\n       \\\"\\\"\\\"\n       use Spark.Dsl.Verifier\n+      alias Spark.Dsl.Verifier\n \n       def verify(dsl) do\n       end\n       \"\"\"\n"
+                },
+                {
+                    "date": 1738185447562,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,18 +34,18 @@\n \n     @impl Igniter.Mix.Task\n     def igniter(igniter) do\n       arguments = igniter.args.positional\n-      options = igniter.args.options\n+      _options = igniter.args.options\n \n       verifier_module = Igniter.Project.Module.parse(arguments.verifier_module)\n \n       template = \"\"\"\n       @moduledoc \\\"\\\"\\\"\n       Generated Spark DSL Verifier.\n       \\\"\\\"\\\"\n       use Spark.Dsl.Verifier\n-      alias Spark.Dsl.Verifier\n+      # alias Spark.Dsl.Verifier\n \n       def verify(dsl) do\n       end\n       \"\"\"\n"
+                },
+                {
+                    "date": 1738185470179,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,8 +46,9 @@\n       use Spark.Dsl.Verifier\n       # alias Spark.Dsl.Verifier\n \n       def verify(dsl) do\n+        IO.inspect(dsl)\n       end\n       \"\"\"\n \n       igniter\n"
+                }
+            ],
+            "date": 1738184307703,
+            "name": "Commit-0",
+            "content": "if Code.ensure_loaded?(Igniter) do\n  defmodule Mix.Tasks.Spark.Gen.Verifier do\n    @moduledoc \"\"\"\n    Generate a Spark DSL Verifier.\n\n    ## Example\n\n        mix spark.gen.verifier Spark.Test.Contact.Verifiers.VerifyNotGandalf\n\n    ## Options\n\n    * `--persisted` - A list of persisted keys to reference in the verifier (e.g., `module`).\n    * `--checks` - Defines checks that the verifier will perform (placeholder for now).\n    * `--error-message` - The error message if the check fails.\n    * `--error-path` - The DSL path where the error should be associated.\n    \"\"\"\n\n    @shortdoc \"Generate a Spark DSL Verifier.\"\n    use Igniter.Mix.Task\n\n    @impl Igniter.Mix.Task\n    def info(_argv, _parent) do\n      %Igniter.Mix.Task.Info{\n        positional: [:verifier_module],\n        example: \"mix spark.gen.verifier Spark.Test.Contact.Verifiers.VerifyNotGandalf\",\n        schema: [\n          persisted: :csv,\n          checks: :csv,\n          error_message: :string,\n          error_path: :csv\n        ],\n        aliases: [\n          p: :persisted,\n          c: :checks,\n          e: :error_message,\n          ep: :error_path\n        ]\n      }\n    end\n\n    @impl Igniter.Mix.Task\n    def igniter(igniter) do\n      arguments = igniter.args.positional\n      options = igniter.args.options\n\n      verifier_module = Igniter.Project.Module.parse(arguments.verifier_module)\n\n      template = \"\"\"\n      defmodule #{verifier_module} do\n        @moduledoc \\\"\\\"\\\"\n        Generated Spark DSL Verifier.\n        \\\"\\\"\\\"\n        use Spark.Dsl.Verifier\n\n        def verify(dsl) do\n        end\n      end\n      \"\"\"\n\n      igniter\n      |> Igniter.Project.Module.create_module(verifier_module, template)\n    end\n  end\nelse\n  defmodule Mix.Tasks.Spark.Gen.Verifier do\n    @moduledoc \"\"\"\n    Generate a Spark DSL Verifier.\n    \"\"\"\n\n    @shortdoc \"Generate a Spark DSL Verifier.\"\n\n    use Mix.Task\n\n    def run(_argv) do\n      Mix.shell().error(\"\"\"\n      The task 'spark.gen.verifier' requires Igniter to be installed.\n\n      Please install Igniter and try again.\n\n      For more information, see: https://hexdocs.pm/igniter\n      \"\"\")\n\n      exit({:shutdown, 1})\n    end\n  end\nend\n"
+        }
+    ]
+}

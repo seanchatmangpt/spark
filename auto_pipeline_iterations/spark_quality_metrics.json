@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-06-12T01:04:46.374938Z",
+  "summary": {
+    "total_files_analyzed": 5,
+    "average_quality_score": 78,
+    "compilation_success_rate": 100,
+    "high_quality_files": 2
+  },
+  "quality_metrics": {
+    "overall_metrics": {
+      "total_files": 5,
+      "compilation_success_rate": 100,
+      "average_quality": 78,
+      "high_quality_percentage": 40
+    },
+    "score_breakdown": {
+      "technical_excellence": 66,
+      "innovation_score": 58,
+      "spec_compliance": 100,
+      "spark_adherence": 85
+    }
+  }
+}
