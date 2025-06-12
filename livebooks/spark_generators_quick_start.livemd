@@ -1,0 +1,727 @@
+# Spark Generators Quick Start
+
+```elixir
+Mix.install([
+  {:spark, "~> 2.2.65"},
+  {:igniter, "~> 0.6.6"},
+  {:kino, "~> 0.12.0"}
+])
+```
+
+## Welcome to Spark Generators! 🔥
+
+This Livebook provides an interactive introduction to Spark DSL generators. You'll learn how to create DSLs, entities, transformers, and more through hands-on examples.
+
+### What You'll Learn
+
+* How to use `spark.gen.dsl` to create complete DSLs
+* How to add entities, transformers, and verifiers
+* How to test your generated DSLs
+* Real-world patterns and best practices
+
+### Prerequisites Check
+
+Let's verify that we have the required dependencies:
+
+```elixir
+# Check if Spark is available
+case Code.ensure_loaded(Spark) do
+  {:module, _} -> 
+    IO.puts("✅ Spark #{Application.spec(:spark, :vsn)} is loaded")
+  {:error, _} -> 
+    IO.puts("❌ Spark not found - please restart the runtime")
+end
+
+# Check if Igniter is available  
+case Code.ensure_loaded(Igniter) do
+  {:module, _} -> 
+    IO.puts("✅ Igniter #{Application.spec(:igniter, :vsn)} is loaded")
+  {:error, _} -> 
+    IO.puts("❌ Igniter not found - please restart the runtime")
+end
+```
+
+## Section 1: Your First DSL in 30 Seconds
+
+Let's create a simple blog DSL step by step. Since we're in a Livebook, we'll simulate the mix commands and show what they would generate.
+
+### Step 1: Understanding the DSL Generator
+
+The `spark.gen.dsl` command creates a complete DSL with sections, entities, and options. Here's what the command would look like:
+
+```bash
+mix spark.gen.dsl MyApp.BlogDsl \
+  --section posts \
+  --entity post:title:string \
+  --examples
+```
+
+### Step 2: Let's Build the DSL Manually to See How It Works
+
+```elixir
+# This is what the generator would create:
+defmodule LivebookExample.BlogDsl do
+  @moduledoc """
+  A simple blog DSL created in this Livebook.
+  
+  This demonstrates what the Spark generator would create.
+  """
+  
+  # Define the entity struct first
+  defmodule Post do
+    defstruct [:title, :content, :author, :published_at, :tags]
+  end
+  
+  # Define the DSL entity
+  @post %Spark.Dsl.Entity{
+    name: :post,
+    args: [:title],
+    target: Post,
+    schema: [
+      title: [type: :string, required: true, doc: "The post title"],
+      content: [type: :string, doc: "The post content"],
+      author: [type: :string, doc: "The post author"],
+      published_at: [type: :utc_datetime, doc: "When the post was published"],
+      tags: [type: {:list, :string}, default: [], doc: "List of tags"]
+    ]
+  }
+  
+  # Define the section
+  @posts %Spark.Dsl.Section{
+    name: :posts,
+    entities: [@post]
+  }
+  
+  # Create the DSL extension
+  use Spark.Dsl.Extension, sections: [@posts]
+end
+```
+
+### Step 3: Create an Info Module for Runtime Access
+
+```elixir
+defmodule LivebookExample.BlogDsl.Info do
+  @moduledoc """
+  Info module for blog DSL introspection.
+  """
+  
+  use Spark.InfoGenerator,
+    extension: LivebookExample.BlogDsl,
+    sections: [:posts]
+end
+```
+
+### Step 4: Use the DSL
+
+Now let's create a blog using our DSL:
+
+```elixir
+defmodule LivebookExample.MyBlog do
+  @moduledoc """
+  Example blog using our generated DSL.
+  """
+  
+  use LivebookExample.BlogDsl
+  
+  post "Welcome to My Blog" do
+    content "This is my first blog post using Spark DSL!"
+    author "John Doe"
+    published_at ~U[2024-01-15 10:00:00Z]
+    tags ["welcome", "spark", "dsl"]
+  end
+  
+  post "Learning Spark Generators" do
+    content "Spark generators make creating DSLs incredibly easy."
+    author "Jane Smith"
+    published_at ~U[2024-01-20 14:30:00Z]
+    tags ["spark", "generators", "tutorial"]
+  end
+end
+```
+
+### Step 5: Test Our DSL
+
+Let's verify that our DSL works correctly:
+
+```elixir
+# Get all posts
+posts = LivebookExample.BlogDsl.Info.posts(LivebookExample.MyBlog)
+
+IO.puts("📝 Number of posts: #{length(posts)}")
+IO.puts("\n📋 Posts:")
+
+for post <- posts do
+  IO.puts("• #{post.title} by #{post.author}")
+  IO.puts("  Tags: #{Enum.join(post.tags, ", ")}")
+  IO.puts("  Published: #{post.published_at}")
+  IO.puts("")
+end
+```
+
+### Step 6: Interactive Test
+
+Let's create a simple interface to explore our posts:
+
+```elixir
+# Create a form to filter posts by tag
+posts = LivebookExample.BlogDsl.Info.posts(LivebookExample.MyBlog)
+all_tags = posts |> Enum.flat_map(& &1.tags) |> Enum.uniq() |> Enum.sort()
+
+tag_input = Kino.Input.select("Filter by tag:", [{"All posts", :all}] ++ Enum.map(all_tags, &{&1, &1}))
+```
+
+```elixir
+# Display filtered posts
+selected_tag = Kino.Input.read(tag_input)
+
+filtered_posts = case selected_tag do
+  :all -> posts
+  tag -> Enum.filter(posts, fn post -> tag in post.tags end)
+end
+
+# Create a nice display
+content = """
+# Filtered Posts (#{length(filtered_posts)} found)
+
+#{for post <- filtered_posts do
+  """
+  ## #{post.title}
+  **Author:** #{post.author}  
+  **Published:** #{post.published_at}  
+  **Tags:** #{Enum.join(post.tags, ", ")}
+  
+  #{post.content}
+  
+  ---
+  """
+end |> Enum.join("\n")}
+"""
+
+Kino.Markdown.new(content)
+```
+
+## Section 2: Adding Transformers
+
+Transformers process your DSL at compile time. Let's add one that automatically adds timestamps:
+
+```elixir
+defmodule LivebookExample.Transformers.AddTimestamps do
+  @moduledoc """
+  A transformer that adds created_at timestamps to posts that don't have them.
+  """
+  
+  use Spark.Dsl.Transformer
+  
+  def transform(dsl_state) do
+    # Get all posts from the DSL state
+    posts = Spark.Dsl.Transformer.get_entities(dsl_state, [:posts])
+    
+    # Add timestamps to posts that don't have them
+    updated_posts = Enum.map(posts, fn post ->
+      if is_nil(post.published_at) do
+        %{post | published_at: DateTime.utc_now()}
+      else
+        post
+      end
+    end)
+    
+    # Replace the posts in the DSL state
+    {:ok, Spark.Dsl.Transformer.replace_entities(dsl_state, [:posts], updated_posts)}
+  end
+end
+```
+
+### Enhanced DSL with Transformer
+
+```elixir
+defmodule LivebookExample.EnhancedBlogDsl do
+  @moduledoc """
+  Enhanced blog DSL with transformer.
+  """
+  
+  # Reuse the same entity and section definitions
+  defmodule Post do
+    defstruct [:title, :content, :author, :published_at, :tags]
+  end
+  
+  @post %Spark.Dsl.Entity{
+    name: :post,
+    args: [:title],
+    target: Post,
+    schema: [
+      title: [type: :string, required: true],
+      content: [type: :string],
+      author: [type: :string],
+      published_at: [type: :utc_datetime],
+      tags: [type: {:list, :string}, default: []]
+    ]
+  }
+  
+  @posts %Spark.Dsl.Section{
+    name: :posts,
+    entities: [@post]
+  }
+  
+  # Add the transformer
+  use Spark.Dsl.Extension, 
+    sections: [@posts],
+    transformers: [LivebookExample.Transformers.AddTimestamps]
+end
+```
+
+```elixir
+defmodule LivebookExample.EnhancedBlogDsl.Info do
+  use Spark.InfoGenerator,
+    extension: LivebookExample.EnhancedBlogDsl,
+    sections: [:posts]
+end
+```
+
+### Test the Enhanced DSL
+
+```elixir
+defmodule LivebookExample.AutoTimestampBlog do
+  use LivebookExample.EnhancedBlogDsl
+  
+  post "Auto-timestamped Post" do
+    content "This post will get an automatic timestamp!"
+    author "Auto Author"
+    tags ["auto", "timestamp"]
+    # Note: no published_at specified - the transformer will add it
+  end
+  
+  post "Manual Timestamp Post" do
+    content "This post has a manual timestamp."
+    author "Manual Author"
+    published_at ~U[2024-01-01 12:00:00Z]
+    tags ["manual", "timestamp"]
+  end
+end
+```
+
+```elixir
+# Check that the transformer worked
+enhanced_posts = LivebookExample.EnhancedBlogDsl.Info.posts(LivebookExample.AutoTimestampBlog)
+
+IO.puts("🔄 Enhanced Blog Posts with Transformer:")
+for post <- enhanced_posts do
+  IO.puts("• #{post.title}")
+  IO.puts("  Published: #{post.published_at}")
+  IO.puts("  (Auto-generated: #{is_nil(Enum.find(enhanced_posts, &(&1.title == post.title and not is_nil(&1.published_at))))})")
+  IO.puts("")
+end
+```
+
+## Section 3: Adding Verifiers
+
+Verifiers validate your DSL configuration. Let's add one that ensures all posts have authors:
+
+```elixir
+defmodule LivebookExample.Verifiers.RequireAuthor do
+  @moduledoc """
+  Verifier that ensures all posts have authors.
+  """
+  
+  use Spark.Dsl.Verifier
+  
+  def verify(dsl_state) do
+    posts = Spark.Dsl.Transformer.get_entities(dsl_state, [:posts])
+    
+    posts_without_authors = Enum.filter(posts, fn post ->
+      is_nil(post.author) or post.author == ""
+    end)
+    
+    if posts_without_authors == [] do
+      :ok
+    else
+      titles = Enum.map(posts_without_authors, & &1.title)
+      {:error, "Posts missing authors: #{Enum.join(titles, ", ")}"}
+    end
+  end
+end
+```
+
+### DSL with Verifier
+
+```elixir
+defmodule LivebookExample.ValidatedBlogDsl do
+  @moduledoc """
+  Blog DSL with validation.
+  """
+  
+  defmodule Post do
+    defstruct [:title, :content, :author, :published_at, :tags]
+  end
+  
+  @post %Spark.Dsl.Entity{
+    name: :post,
+    args: [:title],
+    target: Post,
+    schema: [
+      title: [type: :string, required: true],
+      content: [type: :string],
+      author: [type: :string],
+      published_at: [type: :utc_datetime],
+      tags: [type: {:list, :string}, default: []]
+    ]
+  }
+  
+  @posts %Spark.Dsl.Section{
+    name: :posts,
+    entities: [@post]
+  }
+  
+  use Spark.Dsl.Extension,
+    sections: [@posts],
+    transformers: [LivebookExample.Transformers.AddTimestamps],
+    verifiers: [LivebookExample.Verifiers.RequireAuthor]
+end
+```
+
+### Test Valid Configuration
+
+```elixir
+# This should work fine - all posts have authors
+defmodule LivebookExample.ValidBlog do
+  use LivebookExample.ValidatedBlogDsl
+  
+  post "Valid Post 1" do
+    content "This post has an author."
+    author "John Doe"
+    tags ["valid"]
+  end
+  
+  post "Valid Post 2" do
+    content "This post also has an author."
+    author "Jane Smith"
+    tags ["also-valid"]
+  end
+end
+
+IO.puts("✅ Valid blog compiled successfully!")
+```
+
+### Test Invalid Configuration
+
+```elixir
+# This should fail validation - uncomment to test
+# Note: In a real project, this would fail at compile time
+
+try do
+  defmodule LivebookExample.InvalidBlog do
+    use LivebookExample.ValidatedBlogDsl
+    
+    post "Invalid Post" do
+      content "This post has no author."
+      # author: missing!
+      tags ["invalid"]
+    end
+  end
+  
+  IO.puts("❌ This should have failed validation!")
+rescue
+  error ->
+    IO.puts("✅ Validation caught the error as expected:")
+    IO.puts("   #{inspect(error)}")
+end
+```
+
+## Section 4: Real-World Example - API DSL
+
+Let's build a more complex example - an API definition DSL:
+
+```elixir
+defmodule LivebookExample.ApiDsl do
+  @moduledoc """
+  DSL for defining REST APIs.
+  """
+  
+  defmodule Route do
+    defstruct [:path, :method, :controller, :action, :middleware, :params, :responses]
+  end
+  
+  defmodule Middleware do
+    defstruct [:name, :options]
+  end
+  
+  @route %Spark.Dsl.Entity{
+    name: :route,
+    args: [:path, :method],
+    target: Route,
+    schema: [
+      path: [type: :string, required: true],
+      method: [type: {:one_of, [:get, :post, :put, :delete, :patch]}, required: true],
+      controller: [type: :module, required: true],
+      action: [type: :atom, required: true],
+      middleware: [type: {:list, :atom}, default: []],
+      params: [type: :keyword_list, default: []],
+      responses: [type: :keyword_list, default: []]
+    ]
+  }
+  
+  @middleware %Spark.Dsl.Entity{
+    name: :middleware,
+    args: [:name],
+    target: Middleware,
+    schema: [
+      name: [type: :atom, required: true],
+      options: [type: :keyword_list, default: []]
+    ]
+  }
+  
+  @routes %Spark.Dsl.Section{
+    name: :routes,
+    entities: [@route]
+  }
+  
+  @middleware_section %Spark.Dsl.Section{
+    name: :middleware,
+    entities: [@middleware]
+  }
+  
+  use Spark.Dsl.Extension, sections: [@routes, @middleware_section]
+end
+```
+
+```elixir
+defmodule LivebookExample.ApiDsl.Info do
+  use Spark.InfoGenerator,
+    extension: LivebookExample.ApiDsl,
+    sections: [:routes, :middleware]
+end
+```
+
+### Define an API
+
+```elixir
+defmodule LivebookExample.UserController do
+  def index(params), do: {:ok, %{users: [], page: params[:page] || 1}}
+  def show(params), do: {:ok, %{user: %{id: params[:id], name: "User #{params[:id]}"}}}
+  def create(params), do: {:ok, %{user: %{id: 123, name: params[:name]}}}
+  def update(params), do: {:ok, %{user: %{id: params[:id], name: params[:name]}}}
+  def delete(params), do: {:ok, %{deleted: true}}
+end
+
+defmodule LivebookExample.MyApi do
+  use LivebookExample.ApiDsl
+  
+  middleware :cors do
+    options [origins: ["https://myapp.com"], methods: [:get, :post]]
+  end
+  
+  middleware :auth do
+    options [type: :bearer, required: true]
+  end
+  
+  route "/users", :get do
+    controller LivebookExample.UserController
+    action :index
+    middleware [:cors]
+    params [page: :integer, limit: :integer]
+    responses [ok: :user_list, bad_request: :error]
+  end
+  
+  route "/users/:id", :get do
+    controller LivebookExample.UserController
+    action :show
+    middleware [:cors]
+    params [id: :string]
+    responses [ok: :user, not_found: :error]
+  end
+  
+  route "/users", :post do
+    controller LivebookExample.UserController
+    action :create
+    middleware [:cors, :auth]
+    params [name: :string, email: :string]
+    responses [created: :user, unprocessable_entity: :validation_errors]
+  end
+end
+```
+
+### Explore the API
+
+```elixir
+# Get all routes
+routes = LivebookExample.ApiDsl.Info.routes(LivebookExample.MyApi)
+middleware = LivebookExample.ApiDsl.Info.middleware(LivebookExample.MyApi)
+
+IO.puts("🌐 API Routes (#{length(routes)} total):")
+for route <- routes do
+  IO.puts("#{String.upcase(to_string(route.method))} #{route.path}")
+  IO.puts("  → #{route.controller}.#{route.action}")
+  if route.middleware != [] do
+    IO.puts("  Middleware: #{Enum.join(route.middleware, ", ")}")
+  end
+  IO.puts("")
+end
+
+IO.puts("🔧 Middleware (#{length(middleware)} total):")
+for mw <- middleware do
+  IO.puts("• #{mw.name}: #{inspect(mw.options)}")
+end
+```
+
+### Interactive API Explorer
+
+```elixir
+# Create an interactive route explorer
+route_select = Kino.Input.select(
+  "Select a route to explore:",
+  routes |> Enum.map(fn route -> 
+    {"#{String.upcase(to_string(route.method))} #{route.path}", route}
+  end)
+)
+```
+
+```elixir
+selected_route = Kino.Input.read(route_select)
+
+if selected_route do
+  content = """
+  # Route Details
+  
+  **Path:** `#{selected_route.path}`  
+  **Method:** `#{String.upcase(to_string(selected_route.method))}`  
+  **Controller:** `#{selected_route.controller}`  
+  **Action:** `#{selected_route.action}`
+  
+  ## Middleware
+  #{if selected_route.middleware == [] do
+    "_No middleware configured_"
+  else
+    selected_route.middleware 
+    |> Enum.map(fn mw -> "- `#{mw}`" end) 
+    |> Enum.join("\n")
+  end}
+  
+  ## Parameters
+  #{if selected_route.params == [] do
+    "_No parameters defined_"
+  else
+    selected_route.params 
+    |> Enum.map(fn {name, type} -> "- `#{name}`: #{type}" end) 
+    |> Enum.join("\n")
+  end}
+  
+  ## Responses
+  #{if selected_route.responses == [] do
+    "_No responses defined_"
+  else
+    selected_route.responses 
+    |> Enum.map(fn {status, type} -> "- `#{status}`: #{type}" end) 
+    |> Enum.join("\n")
+  end}
+  
+  ## Test the Route
+  
+  Try calling the controller action:
+  """
+  
+  Kino.Markdown.new(content)
+else
+  Kino.Markdown.new("Select a route above to see details.")
+end
+```
+
+```elixir
+# Test route execution
+if selected_route do
+  # Simulate calling the route
+  test_params = case selected_route.path do
+    "/users" -> %{page: 1, limit: 10}
+    "/users/:id" -> %{id: "123"}
+    _ -> %{}
+  end
+  
+  try do
+    result = apply(selected_route.controller, selected_route.action, [test_params])
+    
+    IO.puts("🧪 Testing route: #{selected_route.method} #{selected_route.path}")
+    IO.puts("📥 Input params: #{inspect(test_params)}")
+    IO.puts("📤 Result: #{inspect(result)}")
+  rescue
+    error ->
+      IO.puts("❌ Error testing route: #{inspect(error)}")
+  end
+else
+  IO.puts("Select a route above to test it.")
+end
+```
+
+## Section 5: Generator Commands Reference
+
+Here are the commands you would use in a real project to generate similar DSLs:
+
+### Blog DSL
+```bash
+# Generate the basic blog DSL
+mix spark.gen.dsl MyApp.BlogDsl \
+  --section posts \
+  --entity post:title:string \
+  --examples
+
+# Add transformer for timestamps
+mix spark.gen.transformer MyApp.Transformers.AddTimestamps \
+  --dsl MyApp.BlogDsl \
+  --persist timestamps \
+  --examples
+
+# Add verifier for required authors
+mix spark.gen.verifier MyApp.Verifiers.RequireAuthor \
+  --dsl MyApp.BlogDsl \
+  --sections posts \
+  --checks author_required \
+  --examples
+
+# Add info module for runtime access
+mix spark.gen.info MyApp.BlogDsl.Info \
+  --extension MyApp.BlogDsl \
+  --sections posts \
+  --functions get_post,find_posts_by_tag \
+  --examples
+```
+
+### API DSL
+```bash
+# Generate the API DSL
+mix spark.gen.dsl MyApp.ApiDsl \
+  --section routes \
+  --section middleware \
+  --entity route:path:string \
+  --entity middleware:name:atom \
+  --examples
+
+# Add route validation
+mix spark.gen.verifier MyApp.Verifiers.ValidateRoutes \
+  --dsl MyApp.ApiDsl \
+  --sections routes \
+  --checks unique_paths,valid_controllers \
+  --examples
+```
+
+## Summary
+
+Congratulations! You've learned how to:
+
+1. ✅ **Create DSLs** with sections and entities
+2. ✅ **Add transformers** for compile-time processing  
+3. ✅ **Add verifiers** for validation
+4. ✅ **Use info modules** for runtime introspection
+5. ✅ **Build complex DSLs** like API definitions
+6. ✅ **Test your DSLs** interactively
+
+### Next Steps
+
+1. **Try the generators** in your own project
+2. **Explore the cookbook** for more complex patterns
+3. **Build your own DSL** for your specific domain
+4. **Share your patterns** with the community
+
+### Resources
+
+- [Spark Documentation](https://hexdocs.pm/spark)
+- [Generator Cookbook](../documentation/tutorials/generators-cookbook.html)
+- [Quick Reference](../documentation/how_to/generators-quick-reference.html)
+
+Happy DSL building! 🚀

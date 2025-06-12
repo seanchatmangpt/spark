@@ -9,6 +9,49 @@
 
 Spark is the foundational framework powering all DSLs in the [Ash Framework](https://ash-hq.org) ecosystem, enabling developers to create sophisticated, production-ready Domain Specific Languages with unprecedented ease and power.
 
+## 🎯 **New: Use Generators Instead of Starting from Scratch!**
+
+**Don't build DSLs manually anymore!** Spark now includes powerful generators that create complete, production-ready DSL components in seconds. Skip the boilerplate and focus on your business logic.
+
+### **⚡ Quick Start with Generators**
+```bash
+# Create a complete DSL in one command
+mix spark.gen.dsl MyApp.ResourceDsl \
+  --section resources \
+  --entity resource:name:module \
+  --transformer MyApp.Transformers.AddDefaults \
+  --verifier MyApp.Verifiers.ValidateResources
+
+# Use your DSL immediately
+defmodule MyApp.UserResource do
+  use MyApp.ResourceDsl
+  
+  resource :users do
+    # Generated structure ready to use!
+  end
+end
+```
+
+**📚 [Complete Generator Documentation →](README_GENERATORS.md)**
+
+### **Why Use Generators?**
+- ✅ **Generate in seconds** what takes hours to write manually  
+- ✅ **Follow best practices** automatically with battle-tested patterns
+- ✅ **Get comprehensive documentation** and examples included
+- ✅ **Avoid common mistakes** with validated, working code
+- ✅ **Focus on business logic** instead of boilerplate
+
+### **Available Generators**
+| Generator | Purpose | Example |
+|-----------|---------|---------|
+| `spark.gen.dsl` | Complete DSL with sections/entities | `mix spark.gen.dsl MyApp.Dsl --section users` |
+| `spark.gen.extension` | Reusable DSL extension | `mix spark.gen.extension MyApp.Validation` |
+| `spark.gen.transformer` | Compile-time processor | `mix spark.gen.transformer MyApp.AddDefaults` |
+| `spark.gen.verifier` | DSL validator | `mix spark.gen.verifier MyApp.ValidateRules` |
+| `spark.gen.info` | Runtime introspection | `mix spark.gen.info MyApp.Dsl.Info` |
+
+**[📖 View all generators and examples →](README_GENERATORS.md)**
+
 ## 🌟 What Makes Spark Revolutionary
 
 ### Zero-Configuration Developer Experience
@@ -35,12 +78,39 @@ Spark is the foundational framework powering all DSLs in the [Ash Framework](htt
 ```elixir
 def deps do
   [
-    {:spark, "~> 2.2.65"}
+    {:spark, "~> 2.2.65"},
+    {:igniter, "~> 0.6.6", only: [:dev]}  # Required for generators
   ]
 end
 ```
 
-### Your First DSL in 30 Seconds
+### Your First DSL in 30 Seconds (Using Generators!)
+```bash
+# Generate a complete DSL in one command
+mix spark.gen.dsl MyApp.Validator \
+  --section fields \
+  --entity field:name:module \
+  --examples
+
+# Your DSL is ready to use immediately!
+defmodule MyApp.PersonValidator do
+  use MyApp.Validator
+
+  fields do
+    field :name do
+      type :string
+      required true
+    end
+    
+    field :age do  
+      type :integer
+      min 0
+    end
+  end
+end
+```
+
+### Manual DSL Creation (Legacy Approach)
 ```elixir
 # 1. Define your DSL extension
 defmodule MyApp.Validator.Dsl do

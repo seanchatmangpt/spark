@@ -65,14 +65,30 @@ defmodule Spark.MixProject do
         ]
       ],
       extras: [
-        "documentation/how_to/upgrade-to-2.0.md",
+        "documentation/tutorials/get-started-with-spark.md",
+        "documentation/tutorials/generators-index.md",
+        "documentation/tutorials/generators-cookbook.md",
+        "documentation/tutorials/generators-examples.md",
+        "documentation/how_to/using-generators.md",
+        "documentation/how_to/generators-quick-reference.md",
         "documentation/how_to/writing-extensions.md",
         "documentation/how_to/split-up-large-dsls.md",
-        "documentation/tutorials/get-started-with-spark.md"
+        "documentation/how_to/upgrade-to-2.0.md"
       ],
       groups_for_extras: [
-        "How To": ~r/documentation\/how_to/,
-        Tutorials: ~r/documentation\/tutorials/
+        Tutorials: [
+          "documentation/tutorials/get-started-with-spark.md",
+          "documentation/tutorials/generators-index.md",
+          "documentation/tutorials/generators-cookbook.md",
+          "documentation/tutorials/generators-examples.md"
+        ],
+        "How To": [
+          "documentation/how_to/using-generators.md",
+          "documentation/how_to/generators-quick-reference.md",
+          "documentation/how_to/writing-extensions.md",
+          "documentation/how_to/split-up-large-dsls.md",
+          "documentation/how_to/upgrade-to-2.0.md"
+        ]
       ],
       groups_for_modules: [
         "DSLs and Extensions": ~r/^Spark.Dsl/,
