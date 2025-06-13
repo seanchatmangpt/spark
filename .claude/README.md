@@ -1,31 +1,32 @@
-# Spark DSL Infinite Agentic Loop System
+# Spark DSL Framework Development Configuration
 
 > *"The best DSLs feel inevitable—as natural as thinking itself."*
 
 ## Overview
 
-This directory contains the configuration and state management for an **Infinite Agentic Loop** system specifically designed for Spark DSL development. Unlike traditional development workflows that require human intervention at each step, this system operates autonomously to generate, evaluate, and iterate on Domain-Specific Language solutions.
+This directory contains enhancement configuration and documentation for the **Spark DSL Framework**. These configurations support building valuable resources around the existing framework through documentation, examples, and tooling - without modifying core framework code (`/lib` and `/test`).
 
-## What is an Infinite Agentic Loop?
+## What is Spark DSL?
 
-An infinite agentic loop is an AI system that:
-1. **Generates** solutions autonomously based on objectives and constraints
-2. **Evaluates** those solutions against comprehensive quality criteria  
-3. **Iterates** by refining and improving based on evaluation feedback
-4. **Learns** from each cycle to improve future generations
-5. **Operates continuously** without requiring human intervention for each cycle
+Spark DSL is a framework that enables developers to create powerful Domain-Specific Languages in Elixir. It provides:
 
-This creates a virtuous cycle of continuous improvement and innovation.
+1. **Extension System** - Build reusable DSL components with entities, transformers, and verifiers
+2. **Code Generation** - Transform DSL definitions into efficient Elixir code
+3. **Validation** - Comprehensive compile-time and runtime validation
+4. **Introspection** - Runtime access to DSL configuration and metadata
+5. **Documentation** - Auto-generate documentation from DSL definitions
 
-## System Architecture
+This creates expressive, declarative APIs that feel natural and intuitive.
+
+## Framework Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│    GENERATE     │ -> │    EVALUATE     │ -> │    ITERATE      │
+│   DSL DESIGN    │ -> │  COMPILATION    │ -> │   RUNTIME       │
 │                 │    │                 │    │                 │
-│ • New DSL ideas │    │ • Quality gates │    │ • Refinements   │
-│ • Code creation │    │ • Testing       │    │ • Optimizations │
-│ • Architectures │    │ • Validation    │    │ • Enhancements  │
+│ • Extensions    │    │ • Transformers  │    │ • Info Access   │
+│ • Entities      │    │ • Verifiers     │    │ • Generated Code│
+│ • Sections      │    │ • Code Gen      │    │ • Introspection │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          ^                        │                        │
          │                        v                        │

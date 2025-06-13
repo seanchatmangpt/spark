@@ -1,0 +1,24 @@
+/* Basic chat demo styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.flash {
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.flash-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.flash-error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}

@@ -1,0 +1,44 @@
+
+10:11:49.595 [info] Running SimpleChatEndpoint with cowboy 2.13.0 at 0.0.0.0:4000 (http)
+🚀 Simple Chat Demo started at http://localhost:4000
+
+10:11:49.597 [info] Access SimpleChatEndpoint at http://localhost:4000
+Open multiple browser tabs to test the chat!
+Press Ctrl+C to stop
+
+10:13:23.666 [info] CONNECTED TO SimpleChatSocket in 23µs
+  Transport: :websocket
+  Serializer: Phoenix.Socket.V2.JSONSerializer
+  Parameters: %{"user_id" => "Alice", "vsn" => "2.0.0"}
+
+10:13:23.681 [info] JOINED chat:lobby in 10µs
+  Parameters: %{}
+
+10:13:24.176 [info] CONNECTED TO SimpleChatSocket in 23µs
+  Transport: :websocket
+  Serializer: Phoenix.Socket.V2.JSONSerializer
+  Parameters: %{"user_id" => "Bob", "vsn" => "2.0.0"}
+
+10:13:24.177 [info] JOINED chat:lobby in 18µs
+  Parameters: %{}
+
+10:13:25.682 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 104µs
+  Parameters: %{"body" => "Hello Bob! How are you?"}
+
+10:13:26.686 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 200µs
+  Parameters: %{"body" => "Hi Alice! I'm doing great, thanks!"}
+
+10:13:27.686 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 33µs
+  Parameters: %{"body" => "That's wonderful! This chat demo is working perfectly"}
+
+10:13:28.688 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 124µs
+  Parameters: %{"body" => "Yes! Real-time messaging with Phoenix channels is amazing"}
+
+10:13:29.689 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 89µs
+  Parameters: %{"body" => "The WebSocket connection is so responsive!"}
+
+10:13:30.690 [debug] HANDLED new_message INCOMING ON chat:lobby (SimpleChatChannel) in 125µs
+  Parameters: %{"body" => "This proves the AsyncAPI implementation works great"}
+
+10:13:36.478 [notice] SIGTERM received - shutting down
+

@@ -1,309 +1,327 @@
-# Spark Repository Enhancement Commands
+# Spark DSL Framework Enhancement Commands
 
 ## Overview
-These commands focus on improving the Spark repository through documentation, examples, tooling, and ecosystem contributions - without modifying core `/lib` or `/test` directories.
+These commands support enhancement of the Spark DSL framework repository through documentation, examples, tooling, and community resources. **Core framework code (`/lib` and `/test`) cannot be modified.**
 
-## Why This Approach?
+## Project Information
+- **Project**: Spark DSL Framework
+- **Version**: 2.2.65
+- **Description**: Generic tooling for building DSLs
+- **Repository**: https://github.com/ash-project/spark
+- **Language**: Elixir 1.15+
 
-### Repository Enhancement Focus
-- **Documentation Excellence**: Create comprehensive guides, tutorials, and examples
-- **Developer Experience**: Build tools and utilities that enhance Spark usage
-- **Community Growth**: Generate content that attracts and educates developers
-- **Ecosystem Expansion**: Create extensions and plugins that showcase Spark capabilities
+## IMPORTANT CONSTRAINTS
+- **NO MODIFICATIONS to `/lib/`** - Core framework is protected
+- **NO MODIFICATIONS to `/test/`** - Existing tests are protected
+- **Focus Areas**: Documentation, examples, tools, guides outside core directories
 
-### Preservation of Core
-- **Stability**: Avoid modifying battle-tested core library code
-- **Maintainer Respect**: Work alongside maintainers, not override their decisions
-- **Community Contribution**: Focus on areas where community contributions are most valued
-- **Safety First**: Enhance without risk of breaking existing functionality
+### Enhancement Purpose
+- **Documentation**: Create comprehensive guides and tutorials
+- **Examples**: Build real-world DSL implementations
+- **Tooling**: Develop utilities that work with existing framework
+- **Community**: Foster ecosystem growth through resources
 
-## What We Improve
+## Repository Structure
 
-### 1. Documentation & Education
-- **Advanced Tutorials**: Complex real-world DSL examples
-- **Best Practices Guides**: Patterns and anti-patterns
-- **Video Content**: Screencast tutorials and workshops
-- **API Documentation**: Enhanced examples and use cases
+### Protected Areas (READ-ONLY)
+- **`/lib/spark/`** - Core DSL framework (CANNOT MODIFY)
+- **`/test/`** - Existing test suites (CANNOT MODIFY)
+- **`/config/`** - Core configuration (CANNOT MODIFY)
+- **`mix.exs`** - Main project file (CANNOT MODIFY)
 
-### 2. Tooling & Developer Experience
-- **Code Generators**: Scaffolding tools for new DSLs
-- **Migration Helpers**: Tools for upgrading between versions
-- **Performance Analyzers**: DSL compilation and runtime analysis
-- **IDE Extensions**: Enhanced editor support
+### Enhancement Areas (CAN MODIFY/CREATE)
+- **`/documentation/`** - Guides, tutorials, and learning resources
+- **`/examples/`** - Real-world DSL implementations and showcases
+- **`/tools/`** - Development utilities and helper scripts
+- **`/guides/`** - Best practices and patterns documentation
+- **`/workshops/`** - Educational content and learning materials
+- **`/ecosystem/`** - Community resources and integrations
+- **`/benchmarks/`** - Performance analysis and demonstrations
 
-### 3. Examples & Showcases
-- **Production DSLs**: Real-world business domain examples
-- **Integration Demos**: Showing Spark with other technologies
-- **Performance Benchmarks**: Demonstrating Spark capabilities
-- **Architecture Patterns**: Advanced usage patterns
+### Umbrella Applications (CAN ENHANCE)
+- **`/apps/agi_factory/`** - AI-driven DSL generation tools
+- **`/apps/dsl_synthesizer/`** - DSL compilation optimization
+- **`/apps/evolution_engine/`** - Genetic algorithm improvements
+- **`/apps/requirements_parser/`** - Natural language processing
+- **`/apps/usage_analyzer/`** - Usage pattern analysis
 
-### 4. Community & Ecosystem
-- **Plugin Framework**: Extensions that build on Spark
-- **Template Library**: Reusable DSL patterns
-- **Contribution Tools**: Making it easier to contribute to Spark
-- **Learning Resources**: Educational content for all skill levels
-
-## How We Implement
-
-### Directory Structure for Enhancements
+## Actual Directory Structure
 ```
 spark/
-├── .claude/                    # Agentic loop configuration
-├── docs/                       # Enhanced documentation
-│   ├── advanced/               # Advanced tutorials
-│   ├── patterns/               # Best practice patterns
-│   ├── examples/               # Comprehensive examples
-│   └── videos/                 # Video content scripts
-├── tools/                      # Developer tools
-│   ├── generators/             # DSL scaffolding
-│   ├── analyzers/              # Performance analysis
-│   └── migrators/              # Version migration helpers
-├── examples/                   # Production-quality examples
-│   ├── business_domains/       # Real-world DSL examples
-│   ├── integrations/           # Integration showcases
-│   └── benchmarks/             # Performance demonstrations
-├── ecosystem/                  # Community extensions
-│   ├── plugins/                # Spark plugins
-│   ├── templates/              # Reusable templates
-│   └── integrations/           # Third-party integrations
-└── contributions/              # Community contribution helpers
-    ├── guides/                 # How to contribute
-    ├── tools/                  # Contribution automation
-    └── standards/              # Quality standards
+├── lib/
+│   ├── spark/
+│   │   ├── dsl/                # Core DSL framework
+│   │   ├── code_helpers.ex     # Code generation utilities
+│   │   ├── error.ex           # Error handling
+│   │   ├── formatter.ex       # Code formatting
+│   │   ├── info.ex            # DSL introspection
+│   │   └── options_helpers.ex # Configuration helpers
+│   └── spark.ex               # Main module
+├── apps/                      # Umbrella applications
+│   ├── agi_factory/           # AI DSL generation
+│   ├── dsl_synthesizer/       # DSL compilation
+│   ├── evolution_engine/      # Genetic algorithms
+│   ├── requirements_parser/   # NLP processing
+│   └── usage_analyzer/        # Usage analytics
+├── test/                      # Test suites
+├── config/                    # Configuration
+├── documentation/             # Guides and tutorials
+└── examples/                  # Example implementations
 ```
 
-## Core Commands
+## Enhancement Commands
 
-### Repository Analysis Commands
+### Analysis Commands
 
-#### `/analyze-repo`
-**Purpose**: Analyze the current state of the Spark repository
+#### `mix test` (READ-ONLY)
+**Purpose**: Understand existing test coverage
 **What it does**:
-- Scans documentation for gaps and opportunities
-- Identifies missing examples and use cases
-- Analyzes issue tracker for community needs
-- Evaluates developer experience pain points
+- Shows current test status (but cannot modify tests)
+- Helps understand framework behavior
+- Identifies areas that might need examples or documentation
+- Validates that existing functionality works
 
-#### `/analyze-ecosystem`
-**Purpose**: Analyze the broader Spark ecosystem
+#### `mix docs` (READ-ONLY) 
+**Purpose**: Generate existing documentation
 **What it does**:
-- Reviews existing Spark-based projects
-- Identifies common patterns and needs
-- Discovers opportunities for new tools/examples
-- Maps the competitive landscape
+- Shows current documentation state
+- Helps identify documentation gaps
+- Provides baseline for enhancement efforts
+- Cannot modify core docs but can supplement them
 
-### Documentation Enhancement Commands
+### Enhancement Creation Commands
 
-#### `/enhance-docs`
-**Purpose**: Improve documentation quality and coverage
-**What it does**:
-- Generates comprehensive tutorials for complex topics
-- Creates missing API documentation examples
-- Develops best practices guides
-- Produces troubleshooting resources
-
-#### `/create-tutorials`
-**Purpose**: Create advanced tutorial content
-**What it does**:
-- Develops step-by-step advanced tutorials
-- Creates video content scripts
-- Builds interactive learning experiences
-- Generates workshop materials
-
-### Example Development Commands
-
-#### `/generate-examples`
-**Purpose**: Create production-quality example DSLs
-**What it does**:
-- Builds complete business domain DSLs
-- Creates integration demonstrations
-- Develops performance showcases
-- Generates architecture pattern examples
-
-#### `/create-benchmarks`
-**Purpose**: Develop performance benchmarks and comparisons
-**What it does**:
-- Creates DSL compilation benchmarks
-- Builds runtime performance tests
-- Generates comparison studies
-- Develops optimization examples
-
-### Tooling Development Commands
-
-#### `/build-tools`
-**Purpose**: Create developer tools that enhance Spark usage
-**What it does**:
-- Builds DSL scaffolding generators
-- Creates migration and upgrade tools
-- Develops performance analysis utilities
-- Builds IDE integration helpers
-
-#### `/create-generators`
-**Purpose**: Build code generation tools for Spark DSLs
-**What it does**:
-- Creates DSL project scaffolding
-- Builds entity/transformer/verifier templates
-- Generates documentation templates
-- Creates testing framework scaffolds
-
-### Ecosystem Development Commands
-
-#### `/build-plugins`
-**Purpose**: Create Spark ecosystem plugins and extensions
-**What it does**:
-- Develops community plugins
-- Creates integration libraries
-- Builds reusable DSL components
-- Generates ecosystem utilities
-
-#### `/create-integrations`
-**Purpose**: Build integrations with popular technologies
-**What it does**:
-- Creates CI/CD integrations
-- Builds cloud platform integrations
-- Develops monitoring/observability integrations
-- Generates deployment automation
-
-### Community Contribution Commands
-
-#### `/enhance-contribution`
-**Purpose**: Improve the contribution experience for Spark
-**What it does**:
-- Creates contribution automation tools
-- Builds quality checking utilities
-- Generates contributor guides
-- Develops community standards
-
-#### `/analyze-community`
-**Purpose**: Analyze community needs and opportunities
-**What it does**:
-- Reviews GitHub issues and discussions
-- Analyzes community forum activity
-- Identifies knowledge gaps
-- Maps contribution opportunities
-
-### Quality Assurance Commands
-
-#### `/validate-quality`
-**Purpose**: Ensure all enhancements meet quality standards
-**What it does**:
-- Validates documentation completeness
-- Checks example correctness
-- Verifies tool functionality
-- Ensures consistency across contributions
-
-#### `/test-examples`
-**Purpose**: Comprehensively test all examples and tools
-**What it does**:
-- Runs all example DSLs
-- Tests tool functionality
-- Validates documentation accuracy
-- Checks integration completeness
-
-## Command Usage Patterns
-
-### Single Enhancement Cycle
+#### Create Documentation
+**Purpose**: Build comprehensive guides and tutorials
+**Commands**:
 ```bash
-/analyze-repo           # Understand current state
-/enhance-docs           # Improve documentation
-/generate-examples      # Create missing examples
-/validate-quality       # Ensure quality standards
+# Create new documentation
+mkdir -p documentation/guides/
+touch documentation/guides/getting-started.md
+touch documentation/guides/advanced-patterns.md
 ```
 
-### Continuous Improvement Loop
+#### Create Examples
+**Purpose**: Build real-world DSL implementations
+**Commands**:
 ```bash
-/continuous-enhancement # Run ongoing enhancement cycles
+# Create example DSL projects
+mkdir -p examples/business-domains/
+mkdir -p examples/integrations/
+touch examples/business-domains/ecommerce-dsl.ex
+touch examples/integrations/phoenix-integration.ex
 ```
 
-### Targeted Improvement
+#### Create Tools
+**Purpose**: Build utilities that enhance developer experience
+**Commands**:
 ```bash
-/focus-documentation    # Focus on docs for one cycle
-/focus-examples         # Focus on examples for one cycle
-/focus-tooling          # Focus on tools for one cycle
+# Create development tools
+mkdir -p tools/generators/
+mkdir -p tools/analyzers/
+touch tools/generators/dsl-scaffold.exs
+touch tools/analyzers/usage-patterns.exs
 ```
 
-### Community Response
+### Umbrella Application Enhancement
+
+#### Enhance AGI Factory
+**Purpose**: Improve AI-driven DSL generation capabilities
+**Commands**:
 ```bash
-/respond-to-issues      # Address community-reported needs
-/implement-requests     # Build requested features/examples
+# Add new examples and documentation
+touch apps/agi_factory/examples/generated-dsl-example.ex
+touch apps/agi_factory/README.md
+mkdir -p apps/agi_factory/guides/
 ```
 
-## Quality Standards
+#### Enhance DSL Synthesizer  
+**Purpose**: Add optimization examples and guides
+**Commands**:
+```bash
+# Create optimization demonstrations
+mkdir -p apps/dsl_synthesizer/examples/
+touch apps/dsl_synthesizer/examples/performance-patterns.ex
+touch apps/dsl_synthesizer/guides/optimization-techniques.md
+```
 
-### Documentation Requirements
-- **Completeness**: All topics thoroughly covered
-- **Accuracy**: All examples tested and working
-- **Clarity**: Written for target audience skill level
-- **Maintenance**: Easy to keep up-to-date
+### Workflow Commands
 
-### Example Requirements
-- **Production Quality**: Real-world applicable
-- **Comprehensive**: Cover full feature usage
-- **Tested**: All examples must compile and run
-- **Documented**: Well-explained and commented
+#### Study Framework (READ-ONLY)
+**Purpose**: Understand existing framework capabilities
+**Commands**:
+```bash
+# Explore existing code (read-only)
+find lib/ -name "*.ex" | head -10
+grep -r "defmodule" lib/ | head -5
+mix deps.tree
+```
 
-### Tool Requirements
-- **Reliability**: Robust error handling
-- **Usability**: Intuitive interfaces
-- **Performance**: Efficient operation
-- **Integration**: Works well with existing workflows
+#### Create Learning Resources
+**Purpose**: Build educational content
+**Commands**:
+```bash
+# Create tutorial series
+mkdir -p workshops/beginner/
+mkdir -p workshops/advanced/
+touch workshops/beginner/01-first-dsl.md
+touch workshops/advanced/01-complex-transformers.md
+```
 
-### Ecosystem Requirements
-- **Compatibility**: Works with current Spark versions
-- **Standards**: Follows Spark conventions
-- **Documentation**: Well-documented APIs
-- **Community**: Addresses real community needs
+### Documentation Commands
 
-## Success Metrics
+#### Create API Guides
+**Purpose**: Build comprehensive API usage guides
+**Commands**:
+```bash
+# Create API documentation supplements
+mkdir -p documentation/api-guides/
+touch documentation/api-guides/extension-development.md
+touch documentation/api-guides/transformer-patterns.md
+touch documentation/api-guides/verifier-best-practices.md
+```
 
-### Repository Health
-- Documentation coverage and quality scores
-- Example comprehensiveness and accuracy
-- Tool adoption and usage metrics
-- Community engagement and satisfaction
+#### Create Troubleshooting Resources
+**Purpose**: Help developers solve common problems
+**Commands**:
+```bash
+# Create troubleshooting resources
+mkdir -p documentation/troubleshooting/
+touch documentation/troubleshooting/common-errors.md
+touch documentation/troubleshooting/debugging-dsls.md
+touch documentation/troubleshooting/performance-issues.md
+```
 
-### Developer Experience
-- Time-to-productivity for new Spark users
-- Reduced support questions and issues
-- Increased community contributions
-- Higher project adoption rates
+### Example Development
 
-### Ecosystem Growth
-- Number of community-created DSLs
-- Integration with popular technologies
-- Third-party tool development
-- Educational content consumption
+#### Business Domain Examples
+**Purpose**: Show real-world DSL applications
+**Commands**:
+```bash
+# Create business domain examples
+mkdir -p examples/domains/
+touch examples/domains/ecommerce-catalog-dsl.ex
+touch examples/domains/workflow-engine-dsl.ex
+touch examples/domains/configuration-management-dsl.ex
+```
 
-## Implementation Strategy
+#### Integration Examples
+**Purpose**: Demonstrate Spark with other technologies
+**Commands**:
+```bash
+# Create integration examples
+mkdir -p examples/integrations/
+touch examples/integrations/phoenix-live-view.ex
+touch examples/integrations/ecto-schema-generation.ex
+touch examples/integrations/otp-supervisor-trees.ex
+```
 
-### Phase 1: Foundation (Weeks 1-2)
-1. **Repository Analysis**: Comprehensive assessment of current state
-2. **Gap Identification**: Document missing pieces and opportunities
-3. **Priority Setting**: Rank improvements by impact and effort
-4. **Infrastructure Setup**: Create directory structure and tooling
+### Umbrella-Specific Commands
 
-### Phase 2: Documentation Excellence (Weeks 3-4)
-1. **Tutorial Creation**: Advanced, real-world tutorials
-2. **Best Practices**: Comprehensive pattern documentation
-3. **API Enhancement**: Improved examples and use cases
-4. **Video Content**: Educational video scripts and materials
+#### AGI Factory Commands
+```bash
+mix test apps/agi_factory           # Test AI DSL generation
+mix run --eval "AgiFactory.demo()"  # Run AGI factory demo
+```
 
-### Phase 3: Example Development (Weeks 5-6)
-1. **Business DSLs**: Production-quality domain examples
-2. **Integration Demos**: Popular technology integrations
-3. **Performance Showcases**: Benchmarks and optimizations
-4. **Architecture Patterns**: Advanced usage demonstrations
+#### DSL Synthesizer Commands
+```bash
+mix test apps/dsl_synthesizer       # Test DSL compilation
+mix compile apps/dsl_synthesizer    # Compile synthesizer
+```
 
-### Phase 4: Tooling & Ecosystem (Weeks 7-8)
-1. **Developer Tools**: Scaffolding and analysis utilities
-2. **Community Plugins**: Ecosystem extensions
-3. **Integration Libraries**: Third-party connections
-4. **Contribution Tools**: Community development helpers
+#### Evolution Engine Commands
+```bash
+mix test apps/evolution_engine      # Test genetic algorithms
+mix run apps/evolution_engine       # Run evolution demo
+```
 
-### Phase 5: Community & Growth (Ongoing)
-1. **Community Engagement**: Responsive to needs and feedback
-2. **Continuous Improvement**: Regular enhancement cycles
-3. **Knowledge Sharing**: Educational content and events
-4. **Ecosystem Support**: Helping community contributions
+## Common Development Workflows
 
-This approach ensures we enhance Spark's value and usability while respecting the core codebase and working collaboratively with the maintainer community.
+### Development Workflow
+```bash
+# Start development session
+iex -S mix
+
+# Run tests continuously during development
+mix test.watch
+
+# Format and check code quality
+mix format && mix credo && mix dialyzer
+
+# Generate documentation
+mix docs
+```
+
+### Testing Workflow
+```bash
+# Run all tests
+mix test
+
+# Run tests with coverage
+mix test --cover
+
+# Test specific umbrella app
+mix test apps/agi_factory
+
+# Test umbrella project
+mix test --umbrella
+```
+
+### Quality Assurance Workflow
+```bash
+# Format code
+mix format
+
+# Check code quality
+mix credo
+
+# Type checking
+mix dialyzer
+
+# Run comprehensive validation
+mix test --cover && mix credo && mix dialyzer
+```
+
+## Enhancement Principles
+
+### Documentation Enhancement Guidelines
+Focus on creating valuable resources that complement the existing framework:
+- **Clarity**: Write clear, actionable guides that help developers succeed
+- **Completeness**: Cover real-world scenarios and edge cases
+- **Examples**: Provide working code examples that can be copy-pasted
+- **Progression**: Build learning paths from beginner to advanced topics
+
+### Example Development Standards
+Create production-quality examples that showcase Spark's capabilities:
+- **Real-world Relevance**: Examples should solve actual business problems
+- **Best Practices**: Demonstrate proper DSL design patterns
+- **Documentation**: Include comprehensive explanations of how and why
+- **Testing**: Examples should include test cases where appropriate
+
+### Tool Development Guidelines
+Build utilities that enhance the developer experience without modifying core code:
+- **Non-invasive**: Tools work alongside existing framework, not within it
+- **Helpful**: Address real pain points in DSL development
+- **Maintainable**: Use simple, clear code that's easy to understand
+- **Documented**: Include usage instructions and examples
+
+## Allowed Enhancement Activities
+
+### ✅ What You CAN Do
+- Create new documentation files in `/documentation/`
+- Build example DSL implementations in `/examples/`
+- Develop tools and utilities in `/tools/`
+- Add guides and tutorials in `/guides/` or `/workshops/`
+- Enhance umbrella applications in `/apps/*/` (non-core areas)
+- Create community resources and templates
+- Build integration showcases
+- Develop educational content
+
+### ❌ What You CANNOT Do
+- Modify any files in `/lib/spark/`
+- Change any files in `/test/`
+- Alter core configuration files
+- Modify `mix.exs` in the root
+- Change dependency specifications in core areas
+- Modify existing framework behavior
